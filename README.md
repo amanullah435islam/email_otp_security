@@ -9,3 +9,34 @@ git push -u origin main
 git remote add origin https://github.com/amanullah435islam/email_otp_security.git
 git branch -M main
 git push -u origin main
+
+
+
+
+
+
+
+Ekhon ei command dao:
+
+git pull origin main --rebase
+
+Jodi editor open hoy, tahole:
+
+:wq → Vim hole save & exit
+ba simply close kore dao
+
+Tarpor:
+
+git push -u origin main
+
+⚠️ Jodi error ase:
+
+fatal: refusing to merge unrelated histories
+
+tahole ei command dao:
+
+git pull origin main --allow-unrelated-histories --rebase
+
+then:
+
+git push -u origin main
