@@ -9,20 +9,20 @@ import com.example.demo.service.EmailService;
 @RequestMapping("/mail")
 public class EmailController {
 
-    @Autowired
-    private EmailService emailService;
-
-    @GetMapping("/send")
-    public String sendMail() {
-
-        emailService.sendEmail(
-                "receiver@gmail.com",
-                "Spring Boot Mail",
-                "Hello! Mail Sent Successfully."
-        );
-
-        return "Mail Sent Successfully";
-    }
+//    @Autowired
+//    private EmailService emailService;
+//
+//    @GetMapping("/send")
+//    public String sendMail() {
+//
+//        emailService.sendEmail(
+//                "receiver@gmail.com",
+//                "Spring Boot Mail",
+//                "Hello! Mail Sent Successfully."
+//        );
+//
+//        return "Mail Sent Successfully";
+//    }
     
     
 }

@@ -18,14 +18,14 @@ public class OtpController {
     private EmailService emailService;
 
     // Send OTP
-    @GetMapping("/send")
-    public String sendOtp(@RequestParam String email) {
-
-        String otp = otpService.generateOtp(email);
-        emailService.sendOtpEmail(email, otp);
-
-        return "OTP sent to " + email;
-    }
+//    @GetMapping("/send")
+//    public String sendOtp(@RequestParam String email) {
+//
+//        String otp = otpService.generateOtp(email);
+//        emailService.sendOtpEmail(email, otp);
+//
+//        return "OTP sent to " + email;
+//    }
 
     // Verify OTP
     @GetMapping("/verify")
