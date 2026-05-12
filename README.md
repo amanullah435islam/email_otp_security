@@ -40,3 +40,23 @@ git pull origin main --allow-unrelated-histories --rebase
 then:
 
 git push -u origin main
+
+
+
+
+✅ FLOW Registration & login initial process::::::::
+Register/Login
+    ↓
+Send OTP to Email
+    ↓
+User enters OTP
+    ↓
+OTP Verify
+    ↓
+JWT Token Generate
+    ↓
+Authentication Complete
+
+
+
+
