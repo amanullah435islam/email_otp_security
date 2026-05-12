@@ -12,12 +12,15 @@ public class OtpService {
 
     private Map<String, String> otpStore = new HashMap<>();
 
+    // generate OTP
     public String generateOtp(String email) {
         String otp = String.valueOf((int)(Math.random() * 900000) + 100000);
+        //String otp = String.valueOf(100000 + new Random().nextInt(900000));
         otpStore.put(email, otp);
         return otp;
     }
 
+ // verify OTP
     public boolean verifyOtp(String email, String otp) {
         return otp.equals(otpStore.get(email));
     }
