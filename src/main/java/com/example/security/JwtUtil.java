@@ -14,7 +14,10 @@ public class JwtUtil {
             "mysecretkeymysecretkeymysecretkey12345";
 
     private Key getKey() {
-        return Keys.hmacShaKeyFor(SECRET.getBytes());
+
+        return Keys.hmacShaKeyFor(
+                SECRET.getBytes()
+        );
     }
 
     public String generateToken(String email) {
@@ -23,7 +26,10 @@ public class JwtUtil {
                 .setSubject(email)
                 .setIssuedAt(new Date())
                 .setExpiration(
-                        new Date(System.currentTimeMillis() + 3600000)
+                        new Date(
+                                System.currentTimeMillis()
+                                        + 3600000
+                        )
                 )
                 .signWith(getKey())
                 .compact();
