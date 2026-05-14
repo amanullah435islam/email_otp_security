@@ -16,6 +16,7 @@ import lombok.ToString;
 @Data
 public class AppUser {
 
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -29,6 +30,8 @@ public class AppUser {
     private boolean verified;
 
     private String verificationToken;
+
+    private String role;
     
     //private String Otp;
     

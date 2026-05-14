@@ -245,7 +245,19 @@ Protected API access
 
 
 
-
+Register
+   ↓
+Role Save
+   ↓
+Login
+   ↓
+JWT Generate
+   ↓
+JWT Filter
+   ↓
+Role Check
+   ↓
+Protected API Access
 
 
 

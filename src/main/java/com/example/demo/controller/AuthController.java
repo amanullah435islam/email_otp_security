@@ -41,40 +41,41 @@ public class AuthController {
     public String register(
             @RequestParam String name,
             @RequestParam String email,
-            @RequestParam String password
+            @RequestParam String password,
+            @RequestParam String role
     ) {
 
-        // CHECK EMAIL EXISTS
-        AppUser existingUser = repo.findByEmail(email);
+        AppUser existing =
+                repo.findByEmail(email);
 
-        if (existingUser != null) {
+        if (existing != null) {
             return "Email Already Exists";
         }
 
-        // GENERATE TOKEN
-        String token = UUID.randomUUID().toString();
+        String token =
+                UUID.randomUUID().toString();
 
-        // CREATE USER
         AppUser user = new AppUser();
 
         user.setName(name);
         user.setEmail(email);
         user.setPassword(password);
 
+        //user.setRole(role);
+        user.setRole(role.toUpperCase());
+
         user.setVerified(false);
 
         user.setVerificationToken(token);
 
-        // SAVE USER
         repo.save(user);
 
-        // SEND EMAIL
         emailService.sendVerificationEmail(
                 email,
                 token
         );
 
-        return "Verification Email Sent Successfully";
+        return "Verification Email Sent";
     }
 
     // =========================
@@ -112,28 +113,28 @@ public class AuthController {
             @RequestParam String password
     ) {
 
-        AppUser user = repo.findByEmail(email);
+        AppUser user =
+                repo.findByEmail(email);
 
-        // USER CHECK
         if (user == null) {
             return "User Not Found";
         }
 
-        // PASSWORD CHECK
-        if (!user.getPassword().equals(password)) {
+        if (!user.getPassword()
+                .equals(password)) {
+
             return "Wrong Password";
         }
 
-        // EMAIL VERIFIED CHECK
         if (!user.isVerified()) {
-            return "Please Verify Your Email First";
+
+            return "Please Verify Email First";
         }
 
-        // GENERATE JWT
-        String jwtToken =
-                jwtUtil.generateToken(email);
-
-        return jwtToken;
+        return jwtUtil.generateToken(
+                user.getEmail(),
+                user.getRole()
+        );
     }
 }
 

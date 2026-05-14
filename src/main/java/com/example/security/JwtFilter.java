@@ -10,7 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.security.authentication.
 UsernamePasswordAuthenticationToken;
-
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.
 SecurityContextHolder;
 
@@ -71,11 +71,25 @@ public class JwtFilter extends OncePerRequestFilter {
             String email =
                     claims.getSubject();
 
+//            UsernamePasswordAuthenticationToken auth =
+//                    new UsernamePasswordAuthenticationToken(
+//                            email,
+//                            null,
+//                            Collections.emptyList()
+//                    );
+            
+            String role =
+                    claims.get("role", String.class);
+            System.out.println("ROLE FROM TOKEN: " + role);
+            System.out.println("AUTHORITY: ROLE_" + role);
+
             UsernamePasswordAuthenticationToken auth =
                     new UsernamePasswordAuthenticationToken(
                             email,
                             null,
-                            Collections.emptyList()
+                            Collections.singletonList(
+                                    new SimpleGrantedAuthority("ROLE_" + role)
+                            )
                     );
 
             auth.setDetails(
@@ -95,7 +109,8 @@ public class JwtFilter extends OncePerRequestFilter {
 
             return;
         }
-
+        
+        System.out.println("AUTH SET DONE");
         filterChain.doFilter(request, response);
     }
 }

@@ -1,7 +1,5 @@
 package com.example.demo.controller;
 
-
-
 import org.springframework.web.bind.annotation
 .GetMapping;
 
@@ -12,12 +10,12 @@ import org.springframework.web.bind.annotation
 .RestController;
 
 @RestController
-@RequestMapping("/doctor")
-public class DoctorController {
+@RequestMapping("/admin")
+public class AdminController {
 
     @GetMapping("/dashboard")
     public String dashboard() {
 
-        return "Welcome Doctor";
+        return "Welcome Admin";
     }
 }

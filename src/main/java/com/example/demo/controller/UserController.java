@@ -4,13 +4,40 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/user")
 public class UserController {
 
-    @GetMapping("/profile")
-    public String profile() {
+    @GetMapping("/dashboard")
+    public String dashboard() {
 
-        return "Welcome Protected API";
+        return "Welcome User";
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//@RestController
+//@RequestMapping("/auth")
+//public class UserController {
+//
+//    @GetMapping("/profile")
+//    public String profile() {
+//
+//        return "Welcome Protected API";
+//    }
+//}
