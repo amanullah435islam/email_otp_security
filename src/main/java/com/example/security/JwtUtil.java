@@ -89,6 +89,31 @@ public class JwtUtil {
 
         return !isTokenExpired(token);
     }
+    
+    
+    
+    
+    public String generateRefreshToken(
+            String email
+    ) {
+
+        return Jwts.builder()
+
+                .setSubject(email)
+
+                .setIssuedAt(new Date())
+
+                .setExpiration(
+                        new Date(
+                                System.currentTimeMillis()
+                                        + 604800000
+                        )
+                )
+
+                .signWith(getKey())
+
+                .compact();
+    }
 }
 
 

@@ -261,3 +261,32 @@ Protected API Access
 
 
 
+
+
+
+
+
+Login
+   ↓
+Access Token (15 min)
+Refresh Token (7 days)
+   ↓
+Access token expired
+   ↓
+Use Refresh Token
+   ↓
+New Access Token
+
+
+LOGIN
+  ↓
+Access Token + Refresh Token
+  ↓
+Access Token Expired
+  ↓
+/auth/refresh
+  ↓
+New Access Token
+
+
+

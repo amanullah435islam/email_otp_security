@@ -5,16 +5,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.web.bind.annotation.RequestMapping;
 //import org.springframework.web.bind.annotation.RequestParam;
 //import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 // //alternative:::
 
 import org.springframework.web.bind.annotation.*;
 
 import com.example.demo.model.AppUser;
+import com.example.demo.model.RefreshToken;
+import com.example.demo.repo.RefreshTokenRepository;
 import com.example.demo.repo.UserRepository;
 import com.example.demo.service.EmailService;
 import com.example.demo.service.OtpService;
 import com.example.security.JwtUtil;
+
+import java.time.LocalDateTime;
 import java.util.Random;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +38,15 @@ public class AuthController {
     private EmailService emailService;
 
     private JwtUtil jwtUtil = new JwtUtil();
-
+    
+    
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    
+    @Autowired
+    private RefreshTokenRepository refreshRepo;
+    
+    
     // =========================
     // REGISTER
     // =========================
@@ -59,7 +72,9 @@ public class AuthController {
 
         user.setName(name);
         user.setEmail(email);
-        user.setPassword(password);
+        user.setPassword(
+                passwordEncoder.encode(password)
+        );
 
         //user.setRole(role);
         user.setRole(role.toUpperCase());
@@ -119,9 +134,11 @@ public class AuthController {
         if (user == null) {
             return "User Not Found";
         }
-
-        if (!user.getPassword()
-                .equals(password)) {
+        
+        if (!passwordEncoder.matches(
+                password,
+                user.getPassword()
+        )) {
 
             return "Wrong Password";
         }
@@ -130,12 +147,76 @@ public class AuthController {
 
             return "Please Verify Email First";
         }
+        
+        
+        String accessToken =
+                jwtUtil.generateToken(
+                        user.getEmail(),
+                        user.getRole()
+                );
+
+        String refreshToken =
+                jwtUtil.generateRefreshToken(
+                        user.getEmail()
+                );
+
+        RefreshToken rt =
+                new RefreshToken();
+
+        rt.setEmail(user.getEmail());
+
+        rt.setToken(refreshToken);
+
+        rt.setExpiryDate(
+                LocalDateTime.now().plusDays(7)
+        );
+
+        refreshRepo.save(rt);
+
+        return
+                "ACCESS TOKEN:\n"
+                        + accessToken
+                        + "\n\nREFRESH TOKEN:\n"
+                        + refreshToken;
+    }
+    
+   
+    // =========================
+    // REFRESH
+    // =========================
+    @PostMapping("/refresh")
+    public String refreshToken(
+            @RequestParam String refreshToken
+    ) {
+
+        RefreshToken tokenData =
+                refreshRepo.findByToken(
+                        refreshToken
+                );
+
+        if (tokenData == null) {
+
+            return "Invalid Refresh Token";
+        }
+
+        if (tokenData.getExpiryDate()
+                .isBefore(LocalDateTime.now())) {
+
+            return "Refresh Token Expired";
+        }
+
+        AppUser user =
+                repo.findByEmail(
+                        tokenData.getEmail()
+                );
 
         return jwtUtil.generateToken(
                 user.getEmail(),
                 user.getRole()
         );
     }
+    
+  
 }
 
 
