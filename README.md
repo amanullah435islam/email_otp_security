@@ -227,7 +227,17 @@ git push -u origin main
 
 
 
-
+Login
+   ↓
+JWT Token পাওয়া
+   ↓
+Frontend token save করবে
+   ↓
+Authorization: Bearer TOKEN
+   ↓
+JWT Filter validate করবে
+   ↓
+Protected API access
 
 
 
