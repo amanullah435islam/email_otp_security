@@ -44,7 +44,7 @@ git push -u origin main
 
 
 
-<<<<<<< HEAD
+
 ✅ FLOW Registration & login initial process::::::::
 Register/Login
     ↓
@@ -55,8 +55,7 @@ User enters OTP
 OTP Verify
     ↓
 JWT Token Generate
-    ↓
-=======
+
 
 
 
@@ -64,32 +63,30 @@ JWT Token Generate
 
 Register/Login
 
-&#x20;   ↓
+   ↓
 
 Send OTP to Email
 
-&#x20;   ↓
+   ↓
 
 User enters OTP
 
-&#x20;   ↓
+   ↓
 
 OTP Verify
 
-&#x20;   ↓
+   ↓
 
 JWT Token Generate
 
-&#x20;   ↓
+   ↓
 
->>>>>>> 0efb443 (Registration into auto veryfied link than login than token)
+Registration into auto veryfied link than login than token.
 Authentication Complete
 
 
 
 
-<<<<<<< HEAD
-=======
 
 
 
@@ -105,23 +102,22 @@ Authentication Complete
 
 User Registration Form Submit
 
-&#x20;       ↓
+      ↓
 
 System sends Email Verification Link
-
-&#x20;       ↓
+      ↓
 
 User opens Gmail
 
-&#x20;       ↓
+      ↓
 
 Clicks Verify Button/Link
 
-&#x20;       ↓
+      ↓
 
 Backend verifies token
 
-&#x20;       ↓
+      ↓
 
 Account Activated / Registration Complete
 
@@ -189,4 +185,4 @@ password=123
 
 eyJhbGciOiJIUzI1NiJ9....
 
->>>>>>> 0efb443 (Registration into auto veryfied link than login than token)
+Registration into auto veryfied link than login than token
