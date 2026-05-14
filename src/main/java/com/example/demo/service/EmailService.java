@@ -5,6 +5,9 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import jakarta.mail.internet.MimeMessage;
+import org.springframework.mail.javamail.MimeMessageHelper;
+
 
 @Service
 public class EmailService {
@@ -12,35 +15,41 @@ public class EmailService {
     @Autowired
     private JavaMailSender mailSender;
 
-    public void sendVerificationEmail(
-            String toEmail,
-            String token
-    ) {
+    public void sendVerificationEmail(String toEmail, String token) {
 
         try {
-
             String verifyLink =
-                    "http://localhost:8080/auth/verify?token="
-                            + token;
+                    "http://localhost:8080/auth/verify?token=" + token;
 
-            SimpleMailMessage message =
-                    new SimpleMailMessage();
+            MimeMessage message =
+                    mailSender.createMimeMessage();
 
-            message.setTo(toEmail);
+            MimeMessageHelper helper =
+                    new MimeMessageHelper(message, true);
 
-            message.setSubject("Verify Your Account");
+            // Sender email + display name
+            helper.setFrom(
+                    "yourgmail@gmail.com",
+                    "My Application"
+            );
 
-            message.setText(
-                    "Click the link below:\n"
-                            + verifyLink
+            helper.setTo(toEmail);
+
+            helper.setSubject(
+                    "Account Verification - My Application"
+            );
+
+            helper.setText(
+                    "Hello,\n\n" +
+                    "Thank you for registering.\n\n" +
+                    "Please click the link below to verify your account:\n\n"
+                    + verifyLink +
+                    "\n\nRegards,\nMy Application Team"
             );
 
             mailSender.send(message);
 
-            System.out.println("MAIL SENT SUCCESSFULLY");
-
         } catch (Exception e) {
-
             e.printStackTrace();
         }
     }

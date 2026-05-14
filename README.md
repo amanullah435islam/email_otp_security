@@ -186,3 +186,56 @@ password=123
 eyJhbGciOiJIUzI1NiJ9....
 
 Registration into auto veryfied link than login than token
+
+
+
+
+
+
+3. File stage koro
+git add README.md
+
+
+Ei command dao:
+
+git rebase --continue
+
+Jodi abar editor open hoy:
+
+
+Esc
+:wq
+Enter
+
+Tarpor abar:
+
+
+git rebase --continue
+
+Jotokkhon na bole:
+
+
+Successfully rebased and updated refs/heads/main
+
+
+Then final push:
+
+git push -u origin main
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
