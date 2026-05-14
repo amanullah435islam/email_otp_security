@@ -290,3 +290,39 @@ New Access Token
 
 
 
+
+
+Proper DTO + Service Layer Refactor
+
+controller/
+service/
+repository/
+entity/
+dto/
+response/
+security/
+
+🔥 REGISTER
+{
+  "name": "Aman",
+  "email": "aman@gmail.com",
+  "password": "123456",
+  "role": "ADMIN"
+}
+🔥 LOGIN
+{
+  "email": "aman@gmail.com",
+  "password": "123456"
+}
+✅ RESPONSE
+{
+  "success": true,
+  "message": "Login Success",
+  "token": "eyJhbGc..."
+}
+
+
+
+
+
+

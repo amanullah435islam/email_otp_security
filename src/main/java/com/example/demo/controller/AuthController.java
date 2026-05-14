@@ -15,16 +15,17 @@ import com.example.demo.model.AppUser;
 import com.example.demo.model.RefreshToken;
 import com.example.demo.repo.RefreshTokenRepository;
 import com.example.demo.repo.UserRepository;
+import com.example.demo.service.AuthService;
 import com.example.demo.service.EmailService;
 import com.example.demo.service.OtpService;
+import com.example.dto.LoginRequest;
+import com.example.dto.RegisterRequest;
+import com.example.response.AuthResponse;
 import com.example.security.JwtUtil;
 
 import java.time.LocalDateTime;
 import java.util.Random;
 import java.util.UUID;
-import org.springframework.beans.factory.annotation.Autowired;
-
-
 
 
 @RestController
@@ -32,192 +33,268 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class AuthController {
 
     @Autowired
-    private UserRepository repo;
+    private AuthService authService;
 
-    @Autowired
-    private EmailService emailService;
-
-    private JwtUtil jwtUtil = new JwtUtil();
-    
-    
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-    
-    @Autowired
-    private RefreshTokenRepository refreshRepo;
-    
-    
-    // =========================
     // REGISTER
-    // =========================
     @PostMapping("/register")
-    public String register(
-            @RequestParam String name,
-            @RequestParam String email,
-            @RequestParam String password,
-            @RequestParam String role
+    public AuthResponse register(
+            @RequestBody RegisterRequest request
     ) {
 
-        AppUser existing =
-                repo.findByEmail(email);
-
-        if (existing != null) {
-            return "Email Already Exists";
-        }
-
-        String token =
-                UUID.randomUUID().toString();
-
-        AppUser user = new AppUser();
-
-        user.setName(name);
-        user.setEmail(email);
-        user.setPassword(
-                passwordEncoder.encode(password)
-        );
-
-        //user.setRole(role);
-        user.setRole(role.toUpperCase());
-
-        user.setVerified(false);
-
-        user.setVerificationToken(token);
-
-        repo.save(user);
-
-        emailService.sendVerificationEmail(
-                email,
-                token
-        );
-
-        return "Verification Email Sent";
+        return authService.register(request);
     }
 
+    // LOGIN
+    @PostMapping("/login")
+    public AuthResponse login(
+            @RequestBody LoginRequest request
+    ) {
+
+        return authService.login(request);
+    }
+    
     // =========================
     // VERIFY EMAIL
     // =========================
+
     @GetMapping("/verify")
     public String verifyEmail(
             @RequestParam String token
     ) {
 
-        AppUser user =
-                repo.findByVerificationToken(token);
-
-        if (user == null) {
-            return "Invalid Verification Token";
-        }
-
-        // VERIFY ACCOUNT
-        user.setVerified(true);
-
-        // REMOVE TOKEN
-        user.setVerificationToken(null);
-
-        repo.save(user);
-
-        return "Account Verified Successfully";
-    }
-
-    // =========================
-    // LOGIN
-    // =========================
-    @PostMapping("/login")
-    public String login(
-            @RequestParam String email,
-            @RequestParam String password
-    ) {
-
-        AppUser user =
-                repo.findByEmail(email);
-
-        if (user == null) {
-            return "User Not Found";
-        }
-        
-        if (!passwordEncoder.matches(
-                password,
-                user.getPassword()
-        )) {
-
-            return "Wrong Password";
-        }
-
-        if (!user.isVerified()) {
-
-            return "Please Verify Email First";
-        }
-        
-        
-        String accessToken =
-                jwtUtil.generateToken(
-                        user.getEmail(),
-                        user.getRole()
-                );
-
-        String refreshToken =
-                jwtUtil.generateRefreshToken(
-                        user.getEmail()
-                );
-
-        RefreshToken rt =
-                new RefreshToken();
-
-        rt.setEmail(user.getEmail());
-
-        rt.setToken(refreshToken);
-
-        rt.setExpiryDate(
-                LocalDateTime.now().plusDays(7)
+        return authService.verifyEmail(
+                token
         );
-
-        refreshRepo.save(rt);
-
-        return
-                "ACCESS TOKEN:\n"
-                        + accessToken
-                        + "\n\nREFRESH TOKEN:\n"
-                        + refreshToken;
     }
     
-   
-    // =========================
-    // REFRESH
-    // =========================
+    
     @PostMapping("/refresh")
-    public String refreshToken(
+    public AuthResponse refreshToken(
             @RequestParam String refreshToken
     ) {
 
-        RefreshToken tokenData =
-                refreshRepo.findByToken(
-                        refreshToken
-                );
-
-        if (tokenData == null) {
-
-            return "Invalid Refresh Token";
-        }
-
-        if (tokenData.getExpiryDate()
-                .isBefore(LocalDateTime.now())) {
-
-            return "Refresh Token Expired";
-        }
-
-        AppUser user =
-                repo.findByEmail(
-                        tokenData.getEmail()
-                );
-
-        return jwtUtil.generateToken(
-                user.getEmail(),
-                user.getRole()
+        return authService.refreshToken(
+                refreshToken
         );
     }
     
-  
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// //Password Encryption + Refresh Token System:::::::::::::::::::::::::::::::::::
+
+//@RestController
+//@RequestMapping("/auth")
+//public class AuthController {
+//
+//    @Autowired
+//    private UserRepository repo;
+//
+//    @Autowired
+//    private EmailService emailService;
+//
+//    private JwtUtil jwtUtil = new JwtUtil();
+//    
+//    
+//    @Autowired
+//    private PasswordEncoder passwordEncoder;
+//    
+//    @Autowired
+//    private RefreshTokenRepository refreshRepo;
+//    
+//    
+//    // =========================
+//    // REGISTER
+//    // =========================
+//    @PostMapping("/register")
+//    public String register(
+//            @RequestParam String name,
+//            @RequestParam String email,
+//            @RequestParam String password,
+//            @RequestParam String role
+//    ) {
+//
+//        AppUser existing =
+//                repo.findByEmail(email);
+//
+//        if (existing != null) {
+//            return "Email Already Exists";
+//        }
+//
+//        String token =
+//                UUID.randomUUID().toString();
+//
+//        AppUser user = new AppUser();
+//
+//        user.setName(name);
+//        user.setEmail(email);
+//        user.setPassword(
+//                passwordEncoder.encode(password)
+//        );
+//
+//        //user.setRole(role);
+//        user.setRole(role.toUpperCase());
+//
+//        user.setVerified(false);
+//
+//        user.setVerificationToken(token);
+//
+//        repo.save(user);
+//
+//        emailService.sendVerificationEmail(
+//                email,
+//                token
+//        );
+//
+//        return "Verification Email Sent";
+//    }
+//
+//    // =========================
+//    // VERIFY EMAIL
+//    // =========================
+//    @GetMapping("/verify")
+//    public String verifyEmail(
+//            @RequestParam String token
+//    ) {
+//
+//        AppUser user =
+//                repo.findByVerificationToken(token);
+//
+//        if (user == null) {
+//            return "Invalid Verification Token";
+//        }
+//
+//        // VERIFY ACCOUNT
+//        user.setVerified(true);
+//
+//        // REMOVE TOKEN
+//        user.setVerificationToken(null);
+//
+//        repo.save(user);
+//
+//        return "Account Verified Successfully";
+//    }
+//
+//    // =========================
+//    // LOGIN
+//    // =========================
+//    @PostMapping("/login")
+//    public String login(
+//            @RequestParam String email,
+//            @RequestParam String password
+//    ) {
+//
+//        AppUser user =
+//                repo.findByEmail(email);
+//
+//        if (user == null) {
+//            return "User Not Found";
+//        }
+//        
+//        if (!passwordEncoder.matches(
+//                password,
+//                user.getPassword()
+//        )) {
+//
+//            return "Wrong Password";
+//        }
+//
+//        if (!user.isVerified()) {
+//
+//            return "Please Verify Email First";
+//        }
+//        
+//        
+//        String accessToken =
+//                jwtUtil.generateToken(
+//                        user.getEmail(),
+//                        user.getRole()
+//                );
+//
+//        String refreshToken =
+//                jwtUtil.generateRefreshToken(
+//                        user.getEmail()
+//                );
+//
+//        RefreshToken rt =
+//                new RefreshToken();
+//
+//        rt.setEmail(user.getEmail());
+//
+//        rt.setToken(refreshToken);
+//
+//        rt.setExpiryDate(
+//                LocalDateTime.now().plusDays(7)
+//        );
+//
+//        refreshRepo.save(rt);
+//
+//        return
+//                "ACCESS TOKEN:\n"
+//                        + accessToken
+//                        + "\n\nREFRESH TOKEN:\n"
+//                        + refreshToken;
+//    }
+//    
+//   
+//    // =========================
+//    // REFRESH
+//    // =========================
+//    @PostMapping("/refresh")
+//    public String refreshToken(
+//            @RequestParam String refreshToken
+//    ) {
+//
+//        RefreshToken tokenData =
+//                refreshRepo.findByToken(
+//                        refreshToken
+//                );
+//
+//        if (tokenData == null) {
+//
+//            return "Invalid Refresh Token";
+//        }
+//
+//        if (tokenData.getExpiryDate()
+//                .isBefore(LocalDateTime.now())) {
+//
+//            return "Refresh Token Expired";
+//        }
+//
+//        AppUser user =
+//                repo.findByEmail(
+//                        tokenData.getEmail()
+//                );
+//
+//        return jwtUtil.generateToken(
+//                user.getEmail(),
+//                user.getRole()
+//        );
+//    }
+//    
+//  
+//}
 
 
 
