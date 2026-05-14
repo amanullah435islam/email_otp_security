@@ -23,6 +23,8 @@ import com.example.dto.RegisterRequest;
 import com.example.response.AuthResponse;
 import com.example.security.JwtUtil;
 
+import jakarta.validation.Valid;
+
 import java.time.LocalDateTime;
 import java.util.Random;
 import java.util.UUID;
@@ -38,6 +40,7 @@ public class AuthController {
     // REGISTER
     @PostMapping("/register")
     public AuthResponse register(
+            @Valid
             @RequestBody RegisterRequest request
     ) {
 
@@ -47,6 +50,7 @@ public class AuthController {
     // LOGIN
     @PostMapping("/login")
     public AuthResponse login(
+    		@Valid
             @RequestBody LoginRequest request
     ) {
 

@@ -325,4 +325,26 @@ security/
 
 
 
+Validation + Global Exception Handler
+
+❌ INVALID REGISTER REQUEST
+{
+  "name": "",
+  "email": "abc",
+  "password": "12",
+  "role": ""
+}
+✅ RESPONSE
+{
+  "timestamp": "2026-05-15T00:00:00",
+  "status": 400,
+  "name": "Name is required",
+  "email": "Invalid email format",
+  "password": "Password minimum 6 characters",
+  "role": "Role is required"
+}
+
+
+
+
 
