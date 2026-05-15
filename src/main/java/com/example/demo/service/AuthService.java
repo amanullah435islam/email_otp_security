@@ -14,6 +14,8 @@ import com.example.dto.RegisterRequest;
 import com.example.response.AuthResponse;
 import com.example.security.JwtUtil;
 
+import jakarta.transaction.Transactional;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -50,6 +52,7 @@ public class AuthService {
             return new AuthResponse(
                     false,
                     "Email Already Exists",
+                    null,
                     null
             );
         }
@@ -86,6 +89,7 @@ public class AuthService {
         return new AuthResponse(
                 true,
                 "Verification Email Sent",
+                null,
                 null
         );
     }
@@ -105,6 +109,7 @@ public class AuthService {
             return new AuthResponse(
                     false,
                     "User Not Found",
+                    null,
                     null
             );
         }
@@ -117,6 +122,7 @@ public class AuthService {
             return new AuthResponse(
                     false,
                     "Wrong Password",
+                    null,
                     null
             );
         }
@@ -126,24 +132,45 @@ public class AuthService {
             return new AuthResponse(
                     false,
                     "Please Verify Email First",
+                    null,
                     null
             );
         }
 
-        String token =
+        String accessToken =
                 jwtUtil.generateToken(
                         user.getEmail(),
                         user.getRole()
                 );
 
+        String refreshToken =
+                jwtUtil.generateRefreshToken(
+                        user.getEmail()
+                );
+
+        RefreshToken rt =
+                new RefreshToken();
+
+        rt.setEmail(user.getEmail());
+
+        rt.setToken(refreshToken);
+
+        rt.setExpiryDate(
+                LocalDateTime.now().plusDays(7)
+        );
+
+        refreshRepo.save(rt);
+
         return new AuthResponse(
                 true,
                 "Login Success",
-                token
-        );
+                accessToken,
+                refreshToken
+        );  
     }
     
     
+    // MAIL VERIFICATION
     public String verifyEmail(
             String token
     ) {
@@ -168,6 +195,7 @@ public class AuthService {
     }
     
     
+    // REFRESH TOKEN
     public AuthResponse refreshToken(
             String refreshToken
     ) {
@@ -182,6 +210,7 @@ public class AuthService {
             return new AuthResponse(
                     false,
                     "Invalid Refresh Token",
+                    null,
                     null
             );
         }
@@ -192,6 +221,7 @@ public class AuthService {
             return new AuthResponse(
                     false,
                     "Refresh Token Expired",
+                    null,
                     null
             );
         }
@@ -201,16 +231,69 @@ public class AuthService {
                         tokenData.getEmail()
                 );
 
-        String newAccessToken =
+        String accessToken =
                 jwtUtil.generateToken(
                         user.getEmail(),
                         user.getRole()
                 );
 
+         refreshToken =
+                jwtUtil.generateRefreshToken(
+                        user.getEmail()
+                );
+
+        RefreshToken rt =
+                new RefreshToken();
+
+        rt.setEmail(user.getEmail());
+
+        rt.setToken(refreshToken);
+
+        rt.setExpiryDate(
+                LocalDateTime.now().plusDays(7)
+        );
+
+        refreshRepo.save(rt);
+
         return new AuthResponse(
                 true,
                 "New Access Token Generated",
-                newAccessToken
+                accessToken,
+                refreshToken
+        );
+    }
+    
+    
+    //LOGOT
+    @Transactional
+    public AuthResponse logout(
+            String refreshToken
+    ) {
+
+        RefreshToken tokenData =
+                refreshRepo.findByToken(
+                        refreshToken
+                );
+
+        if (tokenData == null) {
+
+            return new AuthResponse(
+                    false,
+                    "Refresh Token Not Found",
+                    null,
+                    null
+            );
+        }
+
+        refreshRepo.deleteByToken(
+                refreshToken
+        );
+
+        return new AuthResponse(
+                true,
+                "Logout Successful",
+                null,
+                null
         );
     }
 }

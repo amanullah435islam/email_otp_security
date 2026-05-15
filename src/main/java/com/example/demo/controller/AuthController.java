@@ -37,7 +37,9 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
+    // =========================
     // REGISTER
+    // =========================
     @PostMapping("/register")
     public AuthResponse register(
             @Valid
@@ -47,7 +49,9 @@ public class AuthController {
         return authService.register(request);
     }
 
+    // =========================
     // LOGIN
+    // =========================
     @PostMapping("/login")
     public AuthResponse login(
     		@Valid
@@ -72,12 +76,29 @@ public class AuthController {
     }
     
     
+    // =========================
+    // REFRESH TOKEN
+    // =========================
     @PostMapping("/refresh")
     public AuthResponse refreshToken(
             @RequestParam String refreshToken
     ) {
 
         return authService.refreshToken(
+                refreshToken
+        );
+    }
+    
+    
+    // =========================
+    // LOGOUT
+    // =========================
+    @PostMapping("/logout")
+    public AuthResponse logout(
+            @RequestParam String refreshToken
+    ) {
+
+        return authService.logout(
                 refreshToken
         );
     }

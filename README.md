@@ -347,4 +347,48 @@ Validation + Global Exception Handler
 
 
 
+LOGIN
+POST /auth/login
+
+Response:
+
+Access Token
+Refresh Token
+🔥 LOGOUT
+POST /auth/logout?refreshToken=eyJhbGc...
+✅ RESPONSE
+{
+  "success": true,
+  "message": "Logout Successful",
+  "token": null
+}
+🔥 NOW TRY REFRESH
+POST /auth/refresh
+❌ RESULT
+{
+  "success": false,
+  "message": "Invalid Refresh Token",
+  "token": null
+}
+
+NOW YOUR AUTH SYSTEM HAS
+
+✔ Registration
+✔ Email Verification
+✔ BCrypt Password Encryption
+✔ JWT Authentication
+✔ Refresh Token System
+✔ Logout
+✔ Refresh Token Revoke
+✔ Role Based Security
+✔ Validation
+✔ Global Exception Handling
+✔ Production-Level Architecture
+
+
+
+
+
+
+
 
