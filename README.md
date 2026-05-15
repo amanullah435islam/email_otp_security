@@ -390,5 +390,48 @@ NOW YOUR AUTH SYSTEM HAS
 
 
 
+// //Final version::::::::::::::::::::::::::::
+
+🔥 TOKEN TYPES SUMMARY
+1. Verification Token
+   → Email verify করার জন্য
+
+2. Access Token
+   → Protected API access
+
+3. Refresh Token
+   → New access token generate
+
+register-> mail verify link click /or verify(postman-DB token)->login->user uses permission/dashboard(accessToken)->logout(refreshToken) ->refresh token/new access token(refreshToken)
+
+1. Register
+      ↓
+2. Verification Email Sent
+      ↓
+3. User clicks verification link
+      ↓
+4. Account Verified
+      ↓
+5. Login
+      ↓
+6. Access Token + Refresh Token
+      ↓
+7. Access Protected APIs
+      ↓
+8. Access Token Expires
+      ↓
+9. Refresh Token used
+      ↓
+10. New Access Token
+      ↓
+11. Logout
+      ↓
+12. Refresh Token Revoked/Deleted
+
+
+
+
+
+
 
 

@@ -66,13 +66,11 @@ public class AuthController {
     // =========================
 
     @GetMapping("/verify")
-    public String verifyEmail(
+    public AuthResponse verifyEmail(
             @RequestParam String token
     ) {
 
-        return authService.verifyEmail(
-                token
-        );
+        return authService.verifyEmail(token);
     }
     
     

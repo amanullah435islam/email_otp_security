@@ -2,6 +2,9 @@ package com.example.demo.service;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -33,9 +36,13 @@ public class AuthService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+    
+    @Autowired
+    private AuthenticationManager
+            authenticationManager;
 
-    private JwtUtil jwtUtil =
-            new JwtUtil();
+    @Autowired
+    private JwtUtil jwtUtil;
 
     // REGISTER
     public AuthResponse register(
@@ -99,43 +106,44 @@ public class AuthService {
             LoginRequest request
     ) {
 
+        try {
+
+            authenticationManager.authenticate(
+
+                    new UsernamePasswordAuthenticationToken(
+
+                            request.getEmail(),
+
+                            request.getPassword()
+                    )
+            );
+
+        } catch (Exception e) {
+
+                e.printStackTrace();
+
+                if (e instanceof DisabledException) {
+
+                    return new AuthResponse(
+                            false,
+                            "Please Verify Your Email First",
+                            null,
+                            null
+                    );
+                }
+
+                return new AuthResponse(
+                        false,
+                        "Invalid Email or Password",
+                        null,
+                        null
+                );
+            }
+
         AppUser user =
                 repo.findByEmail(
                         request.getEmail()
                 );
-
-        if (user == null) {
-
-            return new AuthResponse(
-                    false,
-                    "User Not Found",
-                    null,
-                    null
-            );
-        }
-
-        if (!passwordEncoder.matches(
-                request.getPassword(),
-                user.getPassword()
-        )) {
-
-            return new AuthResponse(
-                    false,
-                    "Wrong Password",
-                    null,
-                    null
-            );
-        }
-
-        if (!user.isVerified()) {
-
-            return new AuthResponse(
-                    false,
-                    "Please Verify Email First",
-                    null,
-                    null
-            );
-        }
 
         String accessToken =
                 jwtUtil.generateToken(
@@ -166,12 +174,12 @@ public class AuthService {
                 "Login Success",
                 accessToken,
                 refreshToken
-        );  
+        );
     }
     
     
     // MAIL VERIFICATION
-    public String verifyEmail(
+    public AuthResponse verifyEmail(
             String token
     ) {
 
@@ -182,7 +190,12 @@ public class AuthService {
 
         if (user == null) {
 
-            return "Invalid Verification Token";
+            return new AuthResponse(
+                    false,
+                    "Invalid Verification Token",
+                    null,
+                    null
+            );
         }
 
         user.setVerified(true);
@@ -191,9 +204,13 @@ public class AuthService {
 
         repo.save(user);
 
-        return "Account Verified Successfully";
+        return new AuthResponse(
+                true,
+                "Account Verified Successfully",
+                null,
+                null
+        );
     }
-    
     
     // REFRESH TOKEN
     public AuthResponse refreshToken(
@@ -231,40 +248,22 @@ public class AuthService {
                         tokenData.getEmail()
                 );
 
-        String accessToken =
+        String newAccessToken =
                 jwtUtil.generateToken(
                         user.getEmail(),
                         user.getRole()
                 );
 
-         refreshToken =
-                jwtUtil.generateRefreshToken(
-                        user.getEmail()
-                );
-
-        RefreshToken rt =
-                new RefreshToken();
-
-        rt.setEmail(user.getEmail());
-
-        rt.setToken(refreshToken);
-
-        rt.setExpiryDate(
-                LocalDateTime.now().plusDays(7)
-        );
-
-        refreshRepo.save(rt);
-
         return new AuthResponse(
                 true,
                 "New Access Token Generated",
-                accessToken,
+                newAccessToken,
                 refreshToken
         );
     }
     
     
-    //LOGOT
+    //LOGOUT
     @Transactional
     public AuthResponse logout(
             String refreshToken
