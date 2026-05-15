@@ -435,3 +435,48 @@ register-> mail verify link click /or verify(postman-DB token)->login->user uses
 
 
 
+Login
+  ↓
+JWT Token
+  ↓
+Authorization: Bearer TOKEN
+  ↓
+Current User Identify
+  ↓
+Profile Show/Update
+
+🔥 LOGIN
+POST /auth/login
+
+Copy JWT token.
+
+🔥 GET PROFILE
+GET /user/profile
+
+Header:
+
+Authorization: Bearer TOKEN
+✅ RESPONSE
+{
+  "name": "Aman",
+  "email": "aman@gmail.com",
+  "role": "ADMIN"
+}
+🔥 UPDATE PROFILE
+PUT /user/update
+{
+  "name": "Md Amanullah"
+}
+🔥 CHANGE PASSWORD
+PUT /user/change-password
+{
+  "oldPassword": "123456",
+  "newPassword": "new123456"
+}
+
+
+
+
+
+
+
