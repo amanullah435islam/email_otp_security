@@ -479,4 +479,44 @@ PUT /user/change-password
 
 
 
+Forgot Password
+      ↓
+Email Reset Link
+      ↓
+Click Link
+      ↓
+Reset Password
+
+STEP 1
+POST /auth/forgot-password
+
+BODY:
+
+{
+  "email": "aman@gmail.com"
+}
+📧 EMAIL যাবে
+http://localhost:8080/auth/reset-password-page?token=abc123
+🔥 STEP 2
+
+Copy token.
+
+🔥 STEP 3
+POST /auth/reset-password
+
+BODY:
+
+{
+  "token": "abc123",
+  "newPassword": "new123456"
+}
+✅ RESULT
+{
+  "success": true,
+  "message": "Password Reset Successful",
+  "token": null
+}
+
+
+
 

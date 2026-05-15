@@ -12,8 +12,10 @@ import com.example.demo.model.AppUser;
 import com.example.demo.model.RefreshToken;
 import com.example.demo.repo.RefreshTokenRepository;
 import com.example.demo.repo.UserRepository;
+import com.example.dto.ForgotPasswordRequest;
 import com.example.dto.LoginRequest;
 import com.example.dto.RegisterRequest;
+import com.example.dto.ResetPasswordRequest;
 import com.example.response.AuthResponse;
 import com.example.security.JwtUtil;
 
@@ -295,4 +297,106 @@ public class AuthService {
                 null
         );
     }
+    
+    
+    // FORGOT PASSWORD METHOD
+    public AuthResponse forgotPassword(
+            ForgotPasswordRequest request
+    ) {
+
+        AppUser user =
+                repo.findByEmail(
+                        request.getEmail()
+                );
+
+        if (user == null) {
+
+            return new AuthResponse(
+                    false,
+                    "User Not Found",
+                    null,
+                    null
+            );
+        }
+
+        String token =
+                UUID.randomUUID()
+                        .toString();
+
+        user.setResetToken(token);
+
+        user.setResetTokenExpiry(
+                LocalDateTime.now()
+                        .plusMinutes(15)
+        );
+
+        repo.save(user);
+
+        emailService.sendResetPasswordEmail(
+                user.getEmail(),
+                token
+        );
+
+        return new AuthResponse(
+                true,
+                "Reset Password Email Sent",
+                null,
+                null
+        );
+    }
+    
+    
+    // RESET PASSWORD METHOD
+    public AuthResponse resetPassword(
+            ResetPasswordRequest request
+    ) {
+
+        AppUser user =
+                repo.findByResetToken(
+                        request.getToken()
+                );
+
+        if (user == null) {
+
+            return new AuthResponse(
+                    false,
+                    "Invalid Token",
+                    null,
+                    null
+            );
+        }
+
+        if (user.getResetTokenExpiry()
+                .isBefore(
+                        LocalDateTime.now()
+                )) {
+
+            return new AuthResponse(
+                    false,
+                    "Token Expired",
+                    null,
+                    null
+            );
+        }
+
+        user.setPassword(
+                passwordEncoder.encode(
+                        request.getNewPassword()
+                )
+        );
+
+        user.setResetToken(null);
+
+        user.setResetTokenExpiry(null);
+
+        repo.save(user);
+
+        return new AuthResponse(
+                true,
+                "Password Reset Successful",
+                null,
+                null
+        );
+    }
+    
 }

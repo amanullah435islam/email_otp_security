@@ -18,8 +18,10 @@ import com.example.demo.repo.UserRepository;
 import com.example.demo.service.AuthService;
 import com.example.demo.service.EmailService;
 import com.example.demo.service.OtpService;
+import com.example.dto.ForgotPasswordRequest;
 import com.example.dto.LoginRequest;
 import com.example.dto.RegisterRequest;
+import com.example.dto.ResetPasswordRequest;
 import com.example.response.AuthResponse;
 import com.example.security.JwtUtil;
 
@@ -99,6 +101,35 @@ public class AuthController {
         return authService.logout(
                 refreshToken
         );
+    }
+    
+    
+    // =========================
+    // FORGOT PASSWORD
+    // =========================
+    @PostMapping("/forgot-password")
+    public AuthResponse forgotPassword(
+            @RequestBody
+            ForgotPasswordRequest request
+    ) {
+
+        return authService
+                .forgotPassword(request);
+    }
+    
+    
+    
+    // =========================
+    // RESET PASSWORD
+    // =========================
+    @PostMapping("/reset-password")
+    public AuthResponse resetPassword(
+            @RequestBody
+            ResetPasswordRequest request
+    ) {
+
+        return authService
+                .resetPassword(request);
     }
     
 }

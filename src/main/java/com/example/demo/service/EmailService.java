@@ -53,6 +53,37 @@ public class EmailService {
             e.printStackTrace();
         }
     }
+    
+    
+    
+    public void sendResetPasswordEmail(
+            String to,
+            String token
+    ) {
+
+        String link =
+                "http://localhost:8080/auth/reset-password-page?token="
+                        + token;
+
+        SimpleMailMessage message =
+                new SimpleMailMessage();
+
+        message.setTo(to);
+
+        message.setSubject(
+                "Reset Password"
+        );
+
+        message.setText(
+                "Click this link to reset password:\n"
+                        + link
+        );
+
+        mailSender.send(message);
+    }
+    
+    
+    
 }
 
 

@@ -1,5 +1,7 @@
 package com.example.demo.model;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -34,6 +36,10 @@ public class AppUser {
     private String role;
     
     //private String Otp;
+    
+    private String resetToken;
+
+    private LocalDateTime resetTokenExpiry;
     
     
 }
