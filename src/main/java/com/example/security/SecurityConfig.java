@@ -38,6 +38,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
 
                         .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/oauth2/**").permitAll()
 
                         .requestMatchers("/admin/**").hasRole("ADMIN")
 
@@ -47,7 +48,14 @@ public class SecurityConfig {
 
                         .anyRequest().authenticated()
                 )
+                
+                .oauth2Login(oauth -> oauth
 
+                        .defaultSuccessUrl(
+                                "/auth/google-success",
+                                true
+                        )
+                     )
                 // 🔥 THIS IS MISSING IN YOUR PROJECT
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 

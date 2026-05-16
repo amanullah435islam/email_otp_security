@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.web.bind.annotation.RequestParam;
 //import org.springframework.web.bind.annotation.RestController;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 
 // //alternative:::
 
@@ -131,6 +132,23 @@ public class AuthController {
         return authService
                 .resetPassword(request);
     }
+    
+    
+    
+ // =========================
+    // Google Authentication (OAuth2 Login)
+    // =========================
+    @GetMapping("/google-success")
+    public AuthResponse googleLoginSuccess(
+            OAuth2AuthenticationToken auth
+    ) {
+
+        return authService.googleLoginSuccess(auth);
+    } 
+    
+    
+    
+    
     
 }
 

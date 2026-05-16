@@ -520,3 +520,23 @@ BODY:
 
 
 
+
+
+
+
+Google Authentication (OAuth2 Login):
+Continue with Google
+
+Click Google Login
+      ↓
+Google Account Select
+      ↓
+Google verifies user
+      ↓
+Spring Boot receives user info
+      ↓
+JWT Generate
+
+
+
+

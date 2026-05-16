@@ -6,6 +6,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.model.AppUser;
@@ -396,6 +397,74 @@ public class AuthService {
                 "Password Reset Successful",
                 null,
                 null
+        );
+    }
+    
+    public AuthResponse googleLoginSuccess(
+            OAuth2AuthenticationToken auth
+    ) {
+
+        String email =
+                auth.getPrincipal()
+                        .getAttribute("email");
+
+        String name =
+                auth.getPrincipal()
+                        .getAttribute("name");
+
+        AppUser user =
+                repo.findByEmail(email);
+
+        // NEW USER
+        if (user == null) {
+
+            user = new AppUser();
+
+            user.setName(name);
+
+            user.setEmail(email);
+
+            user.setPassword("GOOGLE_LOGIN");
+
+            user.setRole("USER");
+
+            user.setVerified(true);
+
+            repo.save(user);
+        }
+
+        // ACCESS TOKEN
+        String accessToken =
+                jwtUtil.generateToken(
+                        user.getEmail(),
+                        user.getRole()
+                );
+
+        // REFRESH TOKEN
+        String refreshToken =
+                jwtUtil.generateRefreshToken(
+                        user.getEmail()
+                );
+
+        // SAVE REFRESH TOKEN
+        RefreshToken rt = new RefreshToken();
+
+        rt.setEmail(user.getEmail());
+
+        rt.setToken(refreshToken);
+
+        rt.setExpiryDate(
+                LocalDateTime.now().plusDays(7)
+        );
+
+        refreshRepo.save(rt);
+
+        // RESPONSE
+        return new AuthResponse(
+                true,
+                "Google Login Success",
+                accessToken,
+                refreshToken
         );
     }
     
