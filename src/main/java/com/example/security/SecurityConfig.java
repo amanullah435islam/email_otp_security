@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -33,7 +34,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        http.csrf(csrf -> csrf.disable())
+        http
+        //.cors(cors -> {})   // 🔥 MUST ADD
+        .csrf(csrf -> csrf.disable())
 
                 .authorizeHttpRequests(auth -> auth
 
@@ -45,6 +48,17 @@ public class SecurityConfig {
                         .requestMatchers("/doctor/**").hasRole("DOCTOR")
 
                         .requestMatchers("/user/**").hasRole("USER")
+                        
+                        
+                        
+                        // //permission for test
+                        // 🔓 Test public API (optional)
+                        .requestMatchers("/api/test/public").permitAll()
+
+                        // 🔐 Role based APIs
+                        .requestMatchers("/api/test/admin").hasRole("ADMIN")
+                        .requestMatchers("/api/test/doctor").hasRole("DOCTOR")
+                        .requestMatchers("/api/test/user").hasRole("USER")
 
                         .anyRequest().authenticated()
                 )
@@ -56,6 +70,11 @@ public class SecurityConfig {
                                 true
                         )
                      )
+                
+                // //ai session management rakle Google login null ase.
+                .sessionManagement(sess ->
+                sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
                 // 🔥 THIS IS MISSING IN YOUR PROJECT
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 

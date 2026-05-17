@@ -7,13 +7,20 @@ import io.jsonwebtoken.security.Keys;
 import java.security.Key;
 import java.util.Date;
 
+import io.jsonwebtoken.SignatureAlgorithm;
 
 @Component
 public class JwtUtil {
 
+//    private static final String SECRET =					//normal
+//            "mysecretkeymysecretkeymysecretkey12345";
+    
+//    private static final String SECRET =					//strong but not better
+//            "mysecretkeymysecretkeymysecretkey123456"; 
+    
     private static final String SECRET =
-            "mysecretkeymysecretkeymysecretkey12345";
-
+            "mySuperSecretKeyForJwtAuthentication2026SecureKey";
+    
     // SECRET KEY
     private Key getKey() {
 
@@ -43,7 +50,9 @@ public class JwtUtil {
                         )
                 )
 
-                .signWith(getKey())
+                //.signWith(getKey()) 		//generate → signWith  & 	// verify   → setSigningKey
+                
+                .signWith(getKey(), SignatureAlgorithm.HS256)
 
                 .compact();
     }
@@ -52,13 +61,9 @@ public class JwtUtil {
     public Claims extractClaims(String token) {
 
         return Jwts.parserBuilder()
-
-                .setSigningKey(getKey())
-
+                .setSigningKey(getKey())               
                 .build()
-
                 .parseClaimsJws(token)
-
                 .getBody();
     }
 
@@ -86,32 +91,31 @@ public class JwtUtil {
 
     // VALIDATE TOKEN
     public boolean validateToken(String token) {
+        try {
+            Jwts.parserBuilder()
+                    .setSigningKey(getKey())
+                    .build()
+                    .parseClaimsJws(token);
 
-        return !isTokenExpired(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
     
     
     
     
-    public String generateRefreshToken(
-            String email
-    ) {
+    public String generateRefreshToken(String email) {
 
         return Jwts.builder()
-
                 .setSubject(email)
-
+                .claim("type", "refresh")
                 .setIssuedAt(new Date())
-
                 .setExpiration(
-                        new Date(
-                                System.currentTimeMillis()
-                                        + 604800000
-                        )
+                        new Date(System.currentTimeMillis() + 604800000)
                 )
-
-                .signWith(getKey())
-
+                .signWith(getKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 }

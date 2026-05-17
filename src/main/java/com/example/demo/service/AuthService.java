@@ -400,10 +400,23 @@ public class AuthService {
         );
     }
     
+    
+    // GOOGLE LOGIN
     public AuthResponse googleLoginSuccess(
             OAuth2AuthenticationToken auth
     ) {
 
+    	   // NULL CHECK
+        if (auth == null) {
+
+            return new AuthResponse(
+                    false,
+                    "Google Authentication Failed",
+                    null,
+                    null
+            );
+        }
+        
         String email =
                 auth.getPrincipal()
                         .getAttribute("email");

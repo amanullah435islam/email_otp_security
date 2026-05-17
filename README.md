@@ -539,4 +539,18 @@ JWT Generate
 
 
 
+1. Check application.properties
+
+Ensure real secret nai.
+
+spring.security.oauth2.client.registration.google.client-id=YOUR_GOOGLE_CLIENT_ID
+spring.security.oauth2.client.registration.google.client-secret=YOUR_GOOGLE_CLIENT_SECRET
+2. Last 2 commit reset koro (code thakbe)
+git reset --soft HEAD~2
+3. New clean commit dao
+git commit -m "Google Authentication"
+4. Force push dao
+git push -u origin main --force
+
+
 

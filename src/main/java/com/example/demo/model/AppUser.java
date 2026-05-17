@@ -25,14 +25,20 @@ public class AppUser {
 
     private String name;
 
+//    @Column(unique = true, nullable = false)
+//    private String email;
     private String email;
 
+//    @Column(nullable = true)
+//    private String password;
     private String password;
 
     private boolean verified;
 
     private String verificationToken;
 
+//    @Enumerated(EnumType.STRING)
+//    private Role role;
     private String role;
     
     //private String Otp;

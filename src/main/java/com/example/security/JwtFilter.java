@@ -8,12 +8,15 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.
 UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.
 SecurityContextHolder;
-
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.
 WebAuthenticationDetailsSource;
 
@@ -28,17 +31,16 @@ import java.util.Collections;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
+	
+	
+	@Autowired
+	private JwtUtil jwtUtil;
 
-    private static final String SECRET =
-            "mysecretkeymysecretkeymysecretkey12345";
-
-    private Key getKey() {
-
-        return Keys.hmacShaKeyFor(
-                SECRET.getBytes()
-        );
-    }
-
+	@Autowired
+	private CustomUserDetailsService userDetailsService;
+	
+	private static final Logger log =
+	        LoggerFactory.getLogger(JwtFilter.class);
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,
@@ -50,7 +52,9 @@ public class JwtFilter extends OncePerRequestFilter {
 
     	if (path.startsWith("/auth")
     	        || path.startsWith("/oauth2")
-    	        || path.startsWith("/login")) {
+    	        || path.startsWith("/login")
+    	        || path.startsWith("/api/test/public")
+    			) {
 
     	    filterChain.doFilter(request, response);
     	    return;
@@ -66,53 +70,47 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-        String token =
-                authHeader.substring(7);
+        String token = authHeader.substring(7);
 
-        try {
+     // ✅ validate
+     if (!jwtUtil.validateToken(token)) {
+         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+         return;
+     }
 
-            Claims claims =
-                    Jwts.parserBuilder()
-                            .setSigningKey(getKey())
-                            .build()
-                            .parseClaimsJws(token)
-                            .getBody();
+     try {
 
-            String email =
-                    claims.getSubject();
+         Claims claims = jwtUtil.extractClaims(token);
+         String email = claims.getSubject();
 
-//            UsernamePasswordAuthenticationToken auth =
-//                    new UsernamePasswordAuthenticationToken(
-//                            email,
-//                            null,
-//                            Collections.emptyList()
-//                    );
-            
-            String role =
-                    claims.get("role", String.class);
-            System.out.println("ROLE FROM TOKEN: " + role);
-            System.out.println("AUTHORITY: ROLE_" + role);
+         // ✅ prevent duplicate auth
+         if (SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            UsernamePasswordAuthenticationToken auth =
-                    new UsernamePasswordAuthenticationToken(
-                            email,
-                            null,
-                            Collections.singletonList(
-                                    new SimpleGrantedAuthority("ROLE_" + role)
-                            )
-                    );
+             UserDetails userDetails =
+                     userDetailsService.loadUserByUsername(email);
 
-            auth.setDetails(
-                    new WebAuthenticationDetailsSource()
-                            .buildDetails(request)
-            );
+             UsernamePasswordAuthenticationToken auth =
+                     new UsernamePasswordAuthenticationToken(
+                             userDetails,
+                             null,
+                             userDetails.getAuthorities()
+                     );
 
-            SecurityContextHolder
-                    .getContext()
-                    .setAuthentication(auth);
+             auth.setDetails(
+                     new WebAuthenticationDetailsSource()
+                             .buildDetails(request)
+             );
 
-        } catch (Exception e) {
-
+             SecurityContextHolder
+                     .getContext()
+                     .setAuthentication(auth);
+         }
+         
+         //System.out.println("AUTH SET DONE");
+         log.info("JWT authenticated for {}", email);
+         
+     	} catch (Exception e) {
+     		
             response.setStatus(
                     HttpServletResponse.SC_UNAUTHORIZED
             );
@@ -120,7 +118,8 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
         
-        System.out.println("AUTH SET DONE");
+        
+        
         filterChain.doFilter(request, response);
     }
 }
