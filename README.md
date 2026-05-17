@@ -554,3 +554,33 @@ git push -u origin main --force
 
 
 
+
+
+
+
+1. Register
+email লিখবে
+Register button চাপবে
+fingerprint/passkey তৈরি হবে
+DB তে save হবে
+
+🔹 2. Login
+একই email আবার লিখবে
+এবার Login button চাপবে
+fingerprint prompt আসবে (popup)
+verify হবে
+token আসবে
+
+Step 1:
+Email: aman@gmail.com
+→ Register click
+→ fingerprint set
+
+
+Step 2:
+Email: aman@gmail.com
+→ Login click
+→ fingerprint verify
+→ token get
+
+

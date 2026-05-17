@@ -50,7 +50,8 @@ public class JwtFilter extends OncePerRequestFilter {
     	
     	String path = request.getServletPath();
 
-    	if (path.startsWith("/auth")
+    	//if (path.startsWith("/auth")
+    			if (path.startsWith("/auth/passkey")	//just check purpose
     	        || path.startsWith("/oauth2")
     	        || path.startsWith("/login")
     	        || path.startsWith("/api/test/public")

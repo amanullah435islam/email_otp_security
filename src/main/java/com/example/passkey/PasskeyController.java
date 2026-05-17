@@ -1,12 +1,17 @@
 package com.example.passkey;
 
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import com.yubico.webauthn.data.ByteArray;
 import com.yubico.webauthn.data.PublicKeyCredential;
+
+import jakarta.annotation.PostConstruct;
 
 import com.yubico.webauthn.data.AuthenticatorAttestationResponse;
 import com.yubico.webauthn.data.ClientRegistrationExtensionOutputs;
@@ -14,7 +19,7 @@ import com.yubico.webauthn.data.AuthenticatorAssertionResponse;
 import com.yubico.webauthn.data.ClientAssertionExtensionOutputs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 @RestController
 @RequestMapping("/auth/passkey")
@@ -24,20 +29,49 @@ public class PasskeyController {
     private PasskeyService service;
     
    
+    @Autowired
+    private ObjectMapper objectMapper;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
+    
+    @PostConstruct
+    public void init() {
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        
+        objectMapper.configure(
+        	    com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
+        	    false
+        	);
+    }
     // REGISTER CHALLENGE
     @PostMapping("/register-challenge")
-    public Object registerChallenge(
-            @RequestBody Map<String, String> body
-    ) {
+    public Object registerChallenge(@RequestBody Map<String, String> body) {
 
-        return service.generateRegisterChallenge(
-                body.get("email")
-        );
+        var options = service.generateRegisterChallenge(body.get("email"));
+
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("rp", options.getRp());
+        response.put("user", options.getUser());
+        response.put("challenge", options.getChallenge());
+        response.put("pubKeyCredParams", options.getPubKeyCredParams());
+        response.put("timeout", options.getTimeout());
+
+        // ✅ convert Optional → proper value
+        response.put("excludeCredentials",
+                options.getExcludeCredentials().orElse(Set.of()));
+
+        response.put("authenticatorSelection",
+                options.getAuthenticatorSelection().orElse(null));
+
+        response.put("attestation", options.getAttestation());
+
+        // ❌ extensions একদম দিও না
+
+        System.out.println("REGISTER HIT");
+        return response;
     }
-
+ 
+    
     // LOGIN CHALLENGE
     @PostMapping("/login-challenge")
     public Object loginChallenge(
@@ -81,20 +115,38 @@ public class PasskeyController {
 	} 
     
     
+//    @PostMapping("/register")
+//    public String register(@RequestBody PasskeyRequest req) throws Exception {
+//
+//    	if (req.credential == null) {
+//            return "Credential missing";
+//        }
+//    	
+//        var credential =
+//                //parseRegisterCredential(req.credential);
+//
+//        		 PublicKeyCredential.parseRegistrationResponseJson(
+//                         objectMapper.writeValueAsString(req.credential)
+//                 );
+//        
+//        service.finishRegistration(
+//                credential,
+//                req.email
+//        );
+//
+//        return "Registered Successfully";
+//    }
     @PostMapping("/register")
-    public String register(@RequestBody PasskeyRequest req) throws Exception {
+    public String register(@RequestBody Map<String, Object> req) throws Exception {
 
-    	if (req.credential == null) {
-            return "Credential missing";
-        }
-    	
+        String email = (String) req.get("email");
+
+        String json = objectMapper.writeValueAsString(req.get("credential"));
+
         var credential =
-                parseRegisterCredential(req.credential);
+                PublicKeyCredential.parseRegistrationResponseJson(json);
 
-        service.finishRegistration(
-                credential,
-                req.email
-        );
+        service.finishRegistration(credential, email);
 
         return "Registered Successfully";
     }

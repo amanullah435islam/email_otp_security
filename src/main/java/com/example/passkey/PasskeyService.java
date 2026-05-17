@@ -44,25 +44,45 @@ public class PasskeyService {
     // REGISTER CHALLENGE  
     public PublicKeyCredentialCreationOptions generateRegisterChallenge(String email) {
 
-        PublicKeyCredentialCreationOptions options =
+        PublicKeyCredentialCreationOptions original =
                 relyingParty.startRegistration(
                         StartRegistrationOptions.builder()
                                 .user(
                                         UserIdentity.builder()
                                                 .name(email)
                                                 .displayName(email)
-                                                .id(new ByteArray(email.getBytes())) 		
+                                                .id(new ByteArray(email.getBytes()))
                                                 .build()
                                 )
                                 .build()
                 );
 
-        // 🔥 STORE
-        registerRequestStore.put(email, options);
-        System.out.println(options);
-        return options;
+        registerRequestStore.put(email, original);
+
+        return PublicKeyCredentialCreationOptions.builder()
+                .rp(original.getRp())
+                .user(original.getUser())
+                .challenge(original.getChallenge())
+                .pubKeyCredParams(original.getPubKeyCredParams())
+                .timeout(original.getTimeout())
+
+                // ✅ MUST BE EMPTY ARRAY
+                //.excludeCredentials(Optional.of(new HashSet<>()))
+                .excludeCredentials(Optional.empty())   // 🔥 BEST FIX
+
+                .attestation(original.getAttestation())
+
+                // ❌ NO extensions at all
+
+                .authenticatorSelection(
+                        AuthenticatorSelectionCriteria.builder()
+                                .authenticatorAttachment(AuthenticatorAttachment.PLATFORM)
+                                .userVerification(UserVerificationRequirement.REQUIRED)
+                                .residentKey(ResidentKeyRequirement.REQUIRED)
+                                .build()
+                )
+                .build();
     }
-    
 
     // LOGIN CHALLENGE
     public AssertionRequest generateLoginChallenge(String email) {
@@ -115,7 +135,7 @@ public class PasskeyService {
 
         entity.setEmail(email);
         entity.setCredentialId(result.getKeyId().getId().getBytes());
-        entity.setPublicKey(result.getPublicKeyCose().getBytes());
+        entity.setPublicKey(result.getPublicKeyCose().getBytes());        
         entity.setSignatureCount(result.getSignatureCount());
 
         repo.save(entity);

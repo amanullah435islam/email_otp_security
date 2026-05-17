@@ -35,13 +35,14 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
-        //.cors(cors -> {})   // 🔥 MUST ADD
+        .cors(cors -> {})   // 🔥 MUST ADD
         .csrf(csrf -> csrf.disable())
 
                 .authorizeHttpRequests(auth -> auth
 
-                        .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/oauth2/**").permitAll()
+                        .requestMatchers("/**").permitAll()
+                        //.requestMatchers("/oauth2/**").permitAll()
+                        //.requestMatchers("/auth/passkey/**").permitAll() // 🔥 ADD THIS
 
                         .requestMatchers("/admin/**").hasRole("ADMIN")
 
@@ -63,13 +64,13 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 
-                .oauth2Login(oauth -> oauth
-
-                        .defaultSuccessUrl(
-                                "/auth/google-success",
-                                true
-                        )
-                     )
+//                .oauth2Login(oauth -> oauth
+//
+//                        .defaultSuccessUrl(
+//                                "/auth/google-success",
+//                                true
+//                        )
+//                     )
                 
                 // //ai session management rakle Google login null ase.
                 .sessionManagement(sess ->

@@ -20,15 +20,8 @@ import java.nio.charset.StandardCharsets;
 @RequiredArgsConstructor
 public class InMemoryCredentialRepository implements CredentialRepository {
 
-	
-	
 	   private final PasskeyRepository repo;
 
-	    // 🔥 CONSTRUCTOR INJECTION (BEST)
-//	    public InMemoryCredentialRepository(PasskeyRepository repo) {
-//	        this.repo = repo;
-//	    }
-	    
 
     // 🔹 USER → credential IDs
     @Override
