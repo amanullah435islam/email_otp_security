@@ -2,6 +2,7 @@ package com.example.passkey;
 
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -72,16 +73,64 @@ public class PasskeyController {
     }
  
     
-    // LOGIN CHALLENGE
+//    //only LOGIN CHALLENGE		
+//     //ai code tik ace but nicer ta user kora holo:
+    
+//    @PostMapping("/login-challenge")
+//    public Object loginChallenge(
+//            @RequestBody Map<String, String> body
+//    ) {
+//
+//        return service.generateLoginChallenge(
+//                body.get("email")
+//        );
+//    }
+    
+    
+//  //LOGIN CHALLENGE and login check	
     @PostMapping("/login-challenge")
-    public Object loginChallenge(
-            @RequestBody Map<String, String> body
-    ) {
+    public Object loginChallenge(@RequestBody Map<String, String> body) {
 
-        return service.generateLoginChallenge(
-                body.get("email")
+        var request = service.generateLoginChallenge(body.get("email"));
+        var options = request.getPublicKeyCredentialRequestOptions();
+
+        Map<String, Object> response = new HashMap<>();
+
+        Map<String, Object> pk = new HashMap<>();
+
+        pk.put("challenge", options.getChallenge());
+        pk.put("rpId", options.getRpId());
+        pk.put("timeout", options.getTimeout());
+
+        // ✅ allowCredentials clean fix
+        pk.put("allowCredentials",
+                options.getAllowCredentials()
+                	.orElse(List.of())   // Optional handle
+	                .stream()
+	                .map(c -> {
+	                    Map<String, Object> m = new HashMap<>();
+	                    m.put("type", c.getType());
+	                    m.put("id", c.getId());
+	
+	                    // 🔥 IMPORTANT FIX
+	                    m.put("transports", List.of("internal"));
+	
+	                    return m;
+	                }).toList()
         );
+
+        // 🔥 IMPORTANT FIX
+        pk.put("userVerification", "required");
+
+        // ❌ DON'T add extensions
+
+        response.put("publicKeyCredentialRequestOptions", pk);
+        response.put("username", request.getUsername());
+
+        return response;
     }
+    
+    
     
     
     
@@ -136,6 +185,9 @@ public class PasskeyController {
 //
 //        return "Registered Successfully";
 //    }
+    
+    
+    
     @PostMapping("/register")
     public String register(@RequestBody Map<String, Object> req) throws Exception {
 

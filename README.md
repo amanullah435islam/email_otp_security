@@ -584,3 +584,18 @@ Email: aman@gmail.com
 → token get
 
 
+
+// // full figure print flow::::::::::::::::::::::::::::::::
+Frontend Browser
+      ↓
+WebAuthn API
+      ↓
+Register/Login Credential
+      ↓
+Spring Boot Backend
+      ↓
+Yubico Verification
+      ↓
+JWT Generate
+      ↓
+Secure API Access

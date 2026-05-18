@@ -40,9 +40,9 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
 
-                        .requestMatchers("/**").permitAll()
-                        //.requestMatchers("/oauth2/**").permitAll()
-                        //.requestMatchers("/auth/passkey/**").permitAll() // 🔥 ADD THIS
+                        //.requestMatchers("/**").permitAll()
+                        .requestMatchers("/oauth2/**").permitAll()
+                        .requestMatchers("/auth/**").permitAll() // 🔥 ADD THIS
 
                         .requestMatchers("/admin/**").hasRole("ADMIN")
 
@@ -64,6 +64,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 
+//             // //ai oauth2Login Google login ar jonno::::::::::::::
 //                .oauth2Login(oauth -> oauth
 //
 //                        .defaultSuccessUrl(
@@ -72,7 +73,7 @@ public class SecurityConfig {
 //                        )
 //                     )
                 
-                // //ai session management rakle Google login null ase.
+                // //ai session management rakle Google login null ase::::::::::::
                 .sessionManagement(sess ->
                 sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )

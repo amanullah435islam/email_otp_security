@@ -87,13 +87,29 @@ public class PasskeyService {
     // LOGIN CHALLENGE
     public AssertionRequest generateLoginChallenge(String email) {
 
+    	List<PublicKeyCredentialDescriptor> credentials = repo.findByEmail(email)
+    		    .stream()
+    		    .map(c -> PublicKeyCredentialDescriptor.builder()
+    		        .id(new ByteArray(c.getCredentialId()))
+    		        .type(PublicKeyCredentialType.PUBLIC_KEY)
+
+    		        // 🔥 MOST IMPORTANT LINE
+    		        .transports(Set.of(AuthenticatorTransport.INTERNAL))
+
+    		        .build())
+    		    .toList();
+    	
+    	
         AssertionRequest request =
                 relyingParty.startAssertion(
                         StartAssertionOptions.builder()
                                 .username(email)
+                                
+                                // 🔥 ADD THIS LINE
+                                .userVerification(UserVerificationRequirement.REQUIRED)                                                      
                                 .build()
                 );
-
+    	
         loginRequestStore.put(email, request);
 
         return request;
