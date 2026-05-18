@@ -5,20 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
 import com.yubico.webauthn.data.ByteArray;
 import com.yubico.webauthn.data.PublicKeyCredential;
-
 import jakarta.annotation.PostConstruct;
-
-import com.yubico.webauthn.data.AuthenticatorAttestationResponse;
-import com.yubico.webauthn.data.ClientRegistrationExtensionOutputs;
-import com.yubico.webauthn.data.AuthenticatorAssertionResponse;
-import com.yubico.webauthn.data.ClientAssertionExtensionOutputs;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -28,12 +19,13 @@ public class PasskeyController {
 
     @Autowired
     private PasskeyService service;
-    
-   
+      
     @Autowired
     private ObjectMapper objectMapper;
 
     
+    
+//  // OBJECTMAPPER USE
     @PostConstruct
     public void init() {
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
@@ -43,7 +35,10 @@ public class PasskeyController {
         	    false
         	);
     }
-    // REGISTER CHALLENGE
+    
+    
+    
+//     //REGISTER CHALLENGE AND REGISTER CHECK
     @PostMapping("/register-challenge")
     public Object registerChallenge(@RequestBody Map<String, String> body) {
 
@@ -73,21 +68,8 @@ public class PasskeyController {
     }
  
     
-//    //only LOGIN CHALLENGE		
-//     //ai code tik ace but nicer ta user kora holo:
     
-//    @PostMapping("/login-challenge")
-//    public Object loginChallenge(
-//            @RequestBody Map<String, String> body
-//    ) {
-//
-//        return service.generateLoginChallenge(
-//                body.get("email")
-//        );
-//    }
-    
-    
-//  //LOGIN CHALLENGE and login check	
+//  //LOGIN CHALLENGE AND LOGIN CHECK
     @PostMapping("/login-challenge")
     public Object loginChallenge(@RequestBody Map<String, String> body) {
 
@@ -132,8 +114,7 @@ public class PasskeyController {
     
     
     
-    
-    
+//  // BASE64 CONVERT
     private ByteArray base64ToByteArray(String base64) {
         base64 = base64.replace('-', '+').replace('_', '/');
         return new ByteArray(
@@ -141,53 +122,9 @@ public class PasskeyController {
         );
     }
     
-    private PublicKeyCredential<
-				    AuthenticatorAttestationResponse,
-				    ClientRegistrationExtensionOutputs
-				> parseRegisterCredential(Object credentialObj) throws Exception {
-
-	String json = objectMapper.writeValueAsString(credentialObj);
-	
-	return PublicKeyCredential.parseRegistrationResponseJson(json);
-	}
     
     
-    
-    private PublicKeyCredential<
-				    AuthenticatorAssertionResponse,
-				    ClientAssertionExtensionOutputs
-					> parseLoginCredential(Object assertionObj) throws Exception {
-	
-	String json = objectMapper.writeValueAsString(assertionObj);
-	
-	return PublicKeyCredential.parseAssertionResponseJson(json);
-	} 
-    
-    
-//    @PostMapping("/register")
-//    public String register(@RequestBody PasskeyRequest req) throws Exception {
-//
-//    	if (req.credential == null) {
-//            return "Credential missing";
-//        }
-//    	
-//        var credential =
-//                //parseRegisterCredential(req.credential);
-//
-//        		 PublicKeyCredential.parseRegistrationResponseJson(
-//                         objectMapper.writeValueAsString(req.credential)
-//                 );
-//        
-//        service.finishRegistration(
-//                credential,
-//                req.email
-//        );
-//
-//        return "Registered Successfully";
-//    }
-    
-    
-    
+//  // REGISTER METHODE
     @PostMapping("/register")
     public String register(@RequestBody Map<String, Object> req) throws Exception {
 
@@ -204,6 +141,8 @@ public class PasskeyController {
     }
     
     
+    
+//    // LOGIN METHODE
     @PostMapping("/login")
     public Object login(@RequestBody Map<String, Object> body) throws Exception {
         return service.login(body);

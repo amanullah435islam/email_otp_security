@@ -50,7 +50,8 @@ public class WebAuthnConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowedOrigins(
-                java.util.List.of("http://localhost:5500", "http://127.0.0.1:5500")
+                //java.util.List.of("http://localhost:5500", "http://127.0.0.1:5500")
+                java.util.List.of("http://localhost:5500", "http://localhost:4200")
         );
 
         config.setAllowedMethods(

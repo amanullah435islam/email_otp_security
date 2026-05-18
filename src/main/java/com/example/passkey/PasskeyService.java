@@ -34,14 +34,18 @@ public class PasskeyService {
     private JwtUtil jwtUtil;
     
     
-    
+//  // REGISTER STORE & LOGIN STORE BY MAP
     private Map<String, PublicKeyCredentialCreationOptions> registerRequestStore = new ConcurrentHashMap<>();
     private Map<String, AssertionRequest> loginRequestStore = new ConcurrentHashMap<>();
     
-    // production level debug check
+
+    
+//  // PRODUCT LEVEL DEBUG CHECK    
     private static final Logger log = LoggerFactory.getLogger(PasskeyService.class);
     
-    // REGISTER CHALLENGE  
+    
+    
+//  // REGISTER CHALLENGE
     public PublicKeyCredentialCreationOptions generateRegisterChallenge(String email) {
 
         PublicKeyCredentialCreationOptions original =
@@ -66,14 +70,12 @@ public class PasskeyService {
                 .pubKeyCredParams(original.getPubKeyCredParams())
                 .timeout(original.getTimeout())
 
-                // ✅ MUST BE EMPTY ARRAY
-                //.excludeCredentials(Optional.of(new HashSet<>()))
+                // ✅ MUST BE EMPTY ARRAY              
                 .excludeCredentials(Optional.empty())   // 🔥 BEST FIX
 
                 .attestation(original.getAttestation())
 
                 // ❌ NO extensions at all
-
                 .authenticatorSelection(
                         AuthenticatorSelectionCriteria.builder()
                                 .authenticatorAttachment(AuthenticatorAttachment.PLATFORM)
@@ -84,7 +86,9 @@ public class PasskeyService {
                 .build();
     }
 
-    // LOGIN CHALLENGE
+    
+    
+//    // LOGIN CHALLENGE
     public AssertionRequest generateLoginChallenge(String email) {
 
     	List<PublicKeyCredentialDescriptor> credentials = repo.findByEmail(email)
@@ -115,8 +119,9 @@ public class PasskeyService {
         return request;
     }
     
-   
-    // //verify registration::::::::::
+    
+      
+//     // VERIFY REGISTRATION::::::::::
     public void finishRegistration(
             PublicKeyCredential<
                     AuthenticatorAttestationResponse,
@@ -163,10 +168,8 @@ public class PasskeyService {
     }
     
     
-    
-    
-    
- // //verify registration::::::::::
+          
+//     // VERIFY LOGIN::::::::::
     public boolean finishLogin(
             PublicKeyCredential<
                     AuthenticatorAssertionResponse,
@@ -194,6 +197,8 @@ public class PasskeyService {
         
         // 🔥 IMPORTANT LINE (এইটা তুমি জিজ্ঞেস করছো)
         loginRequestStore.remove(email);
+        
+        
         //System.out.println("Passkey loged for: " + email);
         log.info("Passkey loged for {}", email);
         

@@ -25,10 +25,10 @@ public class RelyingPartyConfig {
                 .identity(rpIdentity)
                 .credentialRepository(repo)
                 .origins(Set.of(
-                        "http://localhost:5500"
+                        //"http://localhost:5500"
+                		"http://localhost:4200"
                 ))
                 .build();
-    }
-    
+    }    
    
 }
