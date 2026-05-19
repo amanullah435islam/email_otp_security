@@ -12,7 +12,7 @@ import org.springframework.security.oauth2.client.authentication.OAuth2Authentic
 
 import org.springframework.web.bind.annotation.*;
 
-import com.example.demo.model.AppUser;
+import com.example.demo.model.User;
 import com.example.demo.model.RefreshToken;
 import com.example.demo.repo.RefreshTokenRepository;
 import com.example.demo.repo.UserRepository;
@@ -138,6 +138,7 @@ public class AuthController {
  // =========================
     // Google Authentication (OAuth2 Login)
     // =========================
+    //@PostMapping("/google-success")
     @GetMapping("/google-success")
     public AuthResponse googleLoginSuccess(
             OAuth2AuthenticationToken auth
@@ -207,7 +208,7 @@ public class AuthController {
 //            @RequestParam String role
 //    ) {
 //
-//        AppUser existing =
+//        User existing =
 //                repo.findByEmail(email);
 //
 //        if (existing != null) {
@@ -217,7 +218,7 @@ public class AuthController {
 //        String token =
 //                UUID.randomUUID().toString();
 //
-//        AppUser user = new AppUser();
+//        User user = new User();
 //
 //        user.setName(name);
 //        user.setEmail(email);
@@ -250,7 +251,7 @@ public class AuthController {
 //            @RequestParam String token
 //    ) {
 //
-//        AppUser user =
+//        User user =
 //                repo.findByVerificationToken(token);
 //
 //        if (user == null) {
@@ -277,7 +278,7 @@ public class AuthController {
 //            @RequestParam String password
 //    ) {
 //
-//        AppUser user =
+//        User user =
 //                repo.findByEmail(email);
 //
 //        if (user == null) {
@@ -354,7 +355,7 @@ public class AuthController {
 //            return "Refresh Token Expired";
 //        }
 //
-//        AppUser user =
+//        User user =
 //                repo.findByEmail(
 //                        tokenData.getEmail()
 //                );
@@ -392,7 +393,7 @@ public class AuthController {
 //    public String register(@RequestParam String email,
 //                           @RequestParam String password) {
 //
-//        AppUser user = new AppUser();
+//        User user = new User();
 //
 //        String otp =
 //                String.valueOf(100000 + new Random().nextInt(900000));
@@ -414,7 +415,7 @@ public class AuthController {
 //    public String verifyRegister(@RequestParam String email,
 //                                 @RequestParam String otp) {
 //
-//        AppUser user = repo.findByEmail(email);
+//        User user = repo.findByEmail(email);
 //
 //        if (user == null) {
 //            return "User Not Found";
@@ -440,7 +441,7 @@ public class AuthController {
 //    public String login(@RequestParam String email,
 //                        @RequestParam String password) {
 //
-//        AppUser user = repo.findByEmail(email);
+//        User user = repo.findByEmail(email);
 //
 //        if (user == null) {
 //            return "User Not Found";
@@ -467,7 +468,7 @@ public class AuthController {
 //    public String verifyLogin(@RequestParam String email,
 //                              @RequestParam String otp) {
 //
-//        AppUser user = repo.findByEmail(email);
+//        User user = repo.findByEmail(email);
 //
 //        if (user.getOtp().equals(otp)) {
 //

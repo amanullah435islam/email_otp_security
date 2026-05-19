@@ -15,7 +15,7 @@ import org.springframework.security.core.userdetails
 
 import org.springframework.stereotype.Service;
 
-import com.example.demo.model.AppUser;
+import com.example.demo.model.User;
 import com.example.demo.repo.UserRepository;
 
 @Service
@@ -30,15 +30,9 @@ public class CustomUserDetailsService
             String email
     ) throws UsernameNotFoundException {
 
-        AppUser user =
-                repo.findByEmail(email);
-
-        if (user == null) {
-
-            throw new UsernameNotFoundException(
-                    "User Not Found"
-            );
-        }
+        User user =
+                repo.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         return new CustomUserDetails(user);
     }

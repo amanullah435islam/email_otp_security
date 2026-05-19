@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import com.yubico.webauthn.data.ByteArray;
@@ -22,6 +25,8 @@ public class PasskeyController {
       
     @Autowired
     private ObjectMapper objectMapper;
+
+    private static final Logger log = LoggerFactory.getLogger(PasskeyController.class);
 
     
     
@@ -48,7 +53,12 @@ public class PasskeyController {
 
         response.put("rp", options.getRp());
         response.put("user", options.getUser());
-        response.put("challenge", options.getChallenge());
+        //response.put("challenge", options.getChallenge());
+        
+        response.put("challenge",
+        	    Base64.getUrlEncoder().withoutPadding()
+        	        .encodeToString(options.getChallenge().getBytes())
+        	);
         response.put("pubKeyCredParams", options.getPubKeyCredParams());
         response.put("timeout", options.getTimeout());
 
@@ -63,7 +73,8 @@ public class PasskeyController {
 
         // ❌ extensions একদম দিও না
 
-        System.out.println("REGISTER HIT");
+        
+        log.info("REGISTER HIT");
         return response;
     }
  

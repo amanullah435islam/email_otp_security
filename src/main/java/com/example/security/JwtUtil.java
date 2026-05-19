@@ -1,6 +1,9 @@
 package com.example.security;
 
 import org.springframework.stereotype.Component;
+
+import com.example.enum1.Role;
+
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.security.Keys;
@@ -32,21 +35,22 @@ public class JwtUtil {
     // GENERATE TOKEN
     public String generateToken(
             String email,
-            String role
+//            String role
+            Role role
     ) {
 
         return Jwts.builder()
 
                 .setSubject(email)
 
-                .claim("role", role)
+                .claim("role", role.name())
 
                 .setIssuedAt(new Date())
 
                 .setExpiration(
                         new Date(
-                                System.currentTimeMillis()
-                                        + 1000 * 60 * 60
+                                System.currentTimeMillis() + 3600000
+                                       
                         )
                 )
 

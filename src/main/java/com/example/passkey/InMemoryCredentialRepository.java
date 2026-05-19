@@ -27,10 +27,13 @@ public class InMemoryCredentialRepository implements CredentialRepository {
     @Override
     public Set<PublicKeyCredentialDescriptor> getCredentialIdsForUsername(String username) {
 
-        return repo.findByEmail(username)
+        return repo.findByUserEmail(username)
                 .stream()
                 .map(c -> PublicKeyCredentialDescriptor.builder()
-                        .id(new ByteArray(c.getCredentialId()))
+                        //.id(new ByteArray(c.getCredentialId()))
+                        .id(new ByteArray(
+                                Base64.getDecoder().decode(c.getCredentialIdBase64())
+                        ))
                         .build())
                 .collect(Collectors.toSet());
     }
@@ -62,16 +65,26 @@ public class InMemoryCredentialRepository implements CredentialRepository {
 
         String email = new String(userHandle.getBytes(), StandardCharsets.UTF_8);
 
-        return repo.findByEmail(email)
+        return repo.findByUserEmail(email)
                 .stream()
-                .filter(c ->
-                        Arrays.equals(c.getCredentialId(), credentialId.getBytes())
-                )
+//                .filter(c ->
+//                        Arrays.equals(c.getCredentialId(), credentialId.getBytes())
+//                )
+                .filter(c -> Arrays.equals(
+                        Base64.getDecoder().decode(c.getCredentialIdBase64()),
+                        credentialId.getBytes()
+                ))
                 .findFirst()
                 .map(c -> RegisteredCredential.builder()
-                        .credentialId(new ByteArray(c.getCredentialId()))
+                        //.credentialId(new ByteArray(c.getCredentialId()))
+                        .credentialId(new ByteArray(
+                                        Base64.getDecoder().decode(c.getCredentialIdBase64())
+                                ))
                         .userHandle(new ByteArray(email.getBytes(StandardCharsets.UTF_8)))
-                        .publicKeyCose(new ByteArray(c.getPublicKey()))
+                        //.publicKeyCose(new ByteArray(c.getPublicKey()))
+                        .publicKeyCose(new ByteArray(
+                                Base64.getDecoder().decode(c.getPublicKey())
+                        ))
                         .signatureCount(c.getSignatureCount())
                         .build());
     }
@@ -82,13 +95,23 @@ public class InMemoryCredentialRepository implements CredentialRepository {
 
         return repo.findAll()
                 .stream()
-                .filter(c ->
-                        Arrays.equals(c.getCredentialId(), credentialId.getBytes())
-                )
+//                .filter(c ->
+//                        Arrays.equals(c.getCredentialId(), credentialId.getBytes())
+//                )
+                .filter(c -> Arrays.equals(
+                        Base64.getDecoder().decode(c.getCredentialIdBase64()),
+                        credentialId.getBytes()
+                ))
                 .map(c -> RegisteredCredential.builder()
-                        .credentialId(new ByteArray(c.getCredentialId()))
-                        .userHandle(new ByteArray(c.getEmail().getBytes(StandardCharsets.UTF_8)))
-                        .publicKeyCose(new ByteArray(c.getPublicKey()))
+                        //.credentialId(new ByteArray(c.getCredentialId()))
+                        .credentialId(new ByteArray(
+                                Base64.getDecoder().decode(c.getCredentialIdBase64())
+                        ))
+                        .userHandle(new ByteArray(c.getUser().getEmail().getBytes(StandardCharsets.UTF_8)))
+                        //.publicKeyCose(new ByteArray(c.getPublicKey()))
+                        .publicKeyCose(new ByteArray(
+                                Base64.getDecoder().decode(c.getPublicKey())
+                        ))
                         .signatureCount(c.getSignatureCount())
                         .build())
                 .collect(Collectors.toSet());

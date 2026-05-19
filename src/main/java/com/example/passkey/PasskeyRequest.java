@@ -11,6 +11,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PasskeyRequest {
-    public String email;
-    public Credential credential;
+
+    private String email;
+    private Credential credential;
 }

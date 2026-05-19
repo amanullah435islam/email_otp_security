@@ -9,7 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Service;
 
-import com.example.demo.model.AppUser;
+import com.example.demo.model.User;
 import com.example.demo.model.RefreshToken;
 import com.example.demo.repo.RefreshTokenRepository;
 import com.example.demo.repo.UserRepository;
@@ -17,6 +17,7 @@ import com.example.dto.ForgotPasswordRequest;
 import com.example.dto.LoginRequest;
 import com.example.dto.RegisterRequest;
 import com.example.dto.ResetPasswordRequest;
+import com.example.enum1.Role;
 import com.example.response.AuthResponse;
 import com.example.security.JwtUtil;
 
@@ -52,26 +53,15 @@ public class AuthService {
             RegisterRequest request
     ) {
 
-        AppUser existing =
-                repo.findByEmail(
-                        request.getEmail()
-                );
-
-        if (existing != null) {
-
-            return new AuthResponse(
-                    false,
-                    "Email Already Exists",
-                    null,
-                    null
-            );
-        }
-
+    	repo.findByEmail(request.getEmail()).ifPresent(user -> {
+    	    throw new RuntimeException("Email Already Exists");
+    	});
+    	
         String token =
                 UUID.randomUUID().toString();
 
-        AppUser user =
-                new AppUser();
+        User user =
+                new User();
 
         user.setName(request.getName());
 
@@ -83,7 +73,8 @@ public class AuthService {
                 )
         );
 
-        user.setRole(request.getRole());
+        //user.setRole(request.getRole());
+        user.setRole(Role.valueOf(request.getRole().toUpperCase()));
 
         user.setVerified(false);
 
@@ -143,26 +134,29 @@ public class AuthService {
                 );
             }
 
-        AppUser user =
-                repo.findByEmail(
-                        request.getEmail()
-                );
-
+        User existing = repo.findByEmail(request.getEmail())
+        			.orElseThrow(() -> new RuntimeException("User not found"));
+        
+        if (!existing.isVerified()) {
+            return new AuthResponse(false, "Please verify email first", null, null);
+        }
+        
+        
         String accessToken =
                 jwtUtil.generateToken(
-                        user.getEmail(),
-                        user.getRole()
+                		existing.getEmail(),
+                		existing.getRole()
                 );
 
         String refreshToken =
                 jwtUtil.generateRefreshToken(
-                        user.getEmail()
+                		existing.getEmail()
                 );
 
         RefreshToken rt =
                 new RefreshToken();
 
-        rt.setEmail(user.getEmail());
+        rt.setEmail(existing.getEmail());
 
         rt.setToken(refreshToken);
 
@@ -186,20 +180,11 @@ public class AuthService {
             String token
     ) {
 
-        AppUser user =
+        User user =
                 repo.findByVerificationToken(
                         token
-                );
-
-        if (user == null) {
-
-            return new AuthResponse(
-                    false,
-                    "Invalid Verification Token",
-                    null,
-                    null
-            );
-        }
+                ) 
+                .orElseThrow(() -> new RuntimeException("Invalid Verification Token"));
 
         user.setVerified(true);
 
@@ -246,10 +231,8 @@ public class AuthService {
             );
         }
 
-        AppUser user =
-                repo.findByEmail(
-                        tokenData.getEmail()
-                );
+        User user = repo.findByEmail(tokenData.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         String newAccessToken =
                 jwtUtil.generateToken(
@@ -305,20 +288,8 @@ public class AuthService {
             ForgotPasswordRequest request
     ) {
 
-        AppUser user =
-                repo.findByEmail(
-                        request.getEmail()
-                );
-
-        if (user == null) {
-
-            return new AuthResponse(
-                    false,
-                    "User Not Found",
-                    null,
-                    null
-            );
-        }
+    	User user = repo.findByEmail(request.getEmail())
+    			 .orElseThrow(() -> new RuntimeException("User not found"));    	
 
         String token =
                 UUID.randomUUID()
@@ -352,25 +323,15 @@ public class AuthService {
             ResetPasswordRequest request
     ) {
 
-        AppUser user =
+        User user =
                 repo.findByResetToken(
                         request.getToken()
-                );
+                ) 
+                .orElseThrow(() -> new RuntimeException("Invalid Token"));
 
-        if (user == null) {
-
-            return new AuthResponse(
-                    false,
-                    "Invalid Token",
-                    null,
-                    null
-            );
-        }
-
-        if (user.getResetTokenExpiry()
-                .isBefore(
-                        LocalDateTime.now()
-                )) {
+   
+        if (user.getResetTokenExpiry() == null ||
+        	    user.getResetTokenExpiry().isBefore(LocalDateTime.now())) {
 
             return new AuthResponse(
                     false,
@@ -425,26 +386,17 @@ public class AuthService {
                 auth.getPrincipal()
                         .getAttribute("name");
 
-        AppUser user =
-                repo.findByEmail(email);
-
-        // NEW USER
-        if (user == null) {
-
-            user = new AppUser();
-
-            user.setName(name);
-
-            user.setEmail(email);
-
-            user.setPassword("GOOGLE_LOGIN");
-
-            user.setRole("USER");
-
-            user.setVerified(true);
-
-            repo.save(user);
-        }
+        User user = repo.findByEmail(email)
+                .orElseGet(() -> {
+                    User newUser = new User();
+                    newUser.setName(name);
+                    newUser.setEmail(email);
+                   // newUser.setPassword("GOOGLE_LOGIN");
+                    newUser.setPassword(passwordEncoder.encode("GOOGLE_LOGIN"));
+                    newUser.setRole(Role.USER);               
+                    newUser.setVerified(true);
+                    return repo.save(newUser);
+                });
 
         // ACCESS TOKEN
         String accessToken =

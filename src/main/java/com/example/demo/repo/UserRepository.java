@@ -1,19 +1,24 @@
 package com.example.demo.repo;
 
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import com.example.demo.model.AppUser;
+import com.example.demo.model.User;
 
 
 @Repository
-public interface UserRepository extends JpaRepository<AppUser, Long> {
+public interface UserRepository extends JpaRepository<User, Long> {
 
-AppUser findByEmail(String email);
+//User findByEmail(String email);
+	Optional<User> findByEmail(String email);
 
-AppUser findByVerificationToken(String token);
+//User findByVerificationToken(String token);
+	Optional<User> findByVerificationToken(String token);
 
-
-	AppUser findByResetToken(
-	        String resetToken
-	);
+//	User findByResetToken(
+//	        String resetToken
+//	);
+	
+	Optional<User> findByResetToken(String token);
 }

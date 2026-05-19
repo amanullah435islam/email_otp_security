@@ -9,5 +9,6 @@ import java.util.List;
 public interface PasskeyRepository
         extends JpaRepository<PasskeyCredential, Long> {
 
-    List<PasskeyCredential> findByEmail(String email);
+	 // 🔥 ADD THIS
+    List<PasskeyCredential> findByUserEmail(String email);
 }

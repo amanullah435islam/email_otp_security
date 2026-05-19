@@ -10,9 +10,12 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Response {
-    public String clientDataJSON;
-    public String attestationObject; // register
-    public String authenticatorData; // login
-    public String signature;
-    public String userHandle;
-}
+
+	    private String clientDataJSON;
+	    private String attestationObject;
+	    private String authenticatorData;
+	    private String signature;
+	    private String userHandle;
+	    
+	    
+	}   

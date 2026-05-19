@@ -37,6 +37,7 @@ public class SecurityConfig {
         http
         .cors(cors -> {})   // 🔥 MUST ADD
         .csrf(csrf -> csrf.disable())
+        .authenticationProvider(authenticationProvider()) // 🔥 ADD THIS
 
                 .authorizeHttpRequests(auth -> auth
 
@@ -118,3 +119,45 @@ public class SecurityConfig {
     }
     
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// //alternative way:::::::::::::::
+
+//http
+//.cors(cors -> cors.configurationSource(request -> {
+//    var config = new org.springframework.web.cors.CorsConfiguration();
+//    config.addAllowedOrigin("http://localhost:4200");
+//    config.addAllowedMethod("*");
+//    config.addAllowedHeader("*");
+//    config.setAllowCredentials(true);
+//    return config;
+//}))
+//.csrf(csrf -> csrf.disable())
+//.authenticationProvider(authenticationProvider())
+//.authorizeHttpRequests(auth -> auth
+//
+//    .requestMatchers("/auth/**").permitAll()
+//    .requestMatchers("/oauth2/**").permitAll()
+//
+//    .requestMatchers("/admin/**").hasRole("ADMIN")
+//    .requestMatchers("/doctor/**").hasRole("DOCTOR")
+//    .requestMatchers("/user/**").hasRole("USER")
+//
+//    .anyRequest().authenticated()
+//)
+//.sessionManagement(sess ->
+//    sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+//)
+//.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

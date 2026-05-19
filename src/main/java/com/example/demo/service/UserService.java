@@ -12,7 +12,7 @@ import org.springframework.security.crypto.password
 
 import org.springframework.stereotype.Service;
 
-import com.example.demo.model.AppUser;
+import com.example.demo.model.User;
 import com.example.demo.repo.UserRepository;
 import com.example.dto.ChangePasswordRequest;
 import com.example.dto.ProfileResponse;
@@ -27,29 +27,33 @@ public class UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-
+    
     // CURRENT USER
-    private AppUser getCurrentUser() {
+    private User getCurrentUser() {
 
-        String email =
-                SecurityContextHolder
-                        .getContext()
-                        .getAuthentication()
-                        .getName();
+        var auth = SecurityContextHolder.getContext().getAuthentication();
 
-        return repo.findByEmail(email);
+        if (auth == null || !auth.isAuthenticated()) {
+            throw new RuntimeException("User not authenticated");
+        }
+
+        String email = auth.getName();
+
+        return repo.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
-
+    
     // GET PROFILE
     public ProfileResponse getProfile() {
 
-        AppUser user =
+        User user =
                 getCurrentUser();
 
         return new ProfileResponse(
                 user.getName(),
                 user.getEmail(),
-                user.getRole()
+                user.getRole() != null ? user.getRole().name() : "USER"
+                
         );
     }
 
@@ -58,7 +62,7 @@ public class UserService {
             UpdateProfileRequest request
     ) {
 
-        AppUser user =
+        User user =
                 getCurrentUser();
 
         user.setName(request.getName());
@@ -78,7 +82,7 @@ public class UserService {
             ChangePasswordRequest request
     ) {
 
-        AppUser user =
+        User user =
                 getCurrentUser();
 
         if (!passwordEncoder.matches(

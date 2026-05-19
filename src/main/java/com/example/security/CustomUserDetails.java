@@ -4,7 +4,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.example.demo.model.AppUser;
+import com.example.demo.model.User;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -12,10 +12,10 @@ import java.util.Collections;
 public class CustomUserDetails
         implements UserDetails {
 
-    private final AppUser user;
+    private final User user;
 
     public CustomUserDetails(
-            AppUser user
+            User user
     ) {
         this.user = user;
     }
@@ -64,6 +64,8 @@ public class CustomUserDetails
     @Override
     public boolean isEnabled() {
 
-        return user.isVerified();
+        //return user.isVerified();
+    	
+    	return true;
     }
 }

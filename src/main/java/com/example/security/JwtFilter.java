@@ -39,8 +39,12 @@ public class JwtFilter extends OncePerRequestFilter {
 	@Autowired
 	private CustomUserDetailsService userDetailsService;
 	
+	
 	private static final Logger log =
 	        LoggerFactory.getLogger(JwtFilter.class);
+	
+	
+	
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,
@@ -71,13 +75,9 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-        String token = authHeader.substring(7);
+        //String token = authHeader.substring(7);
+        String token = authHeader != null ? authHeader.substring(7).trim() : null;
 
-     // ✅ validate
-     if (!jwtUtil.validateToken(token)) {
-         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-         return;
-     }
 
      try {
 

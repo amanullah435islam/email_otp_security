@@ -10,7 +10,9 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Credential {
-    public String id;
-    public String rawId;
-    public Response response;
+
+    private String id;
+    private String rawId;
+    private String type;   // 🔥 ADD THIS
+    private Response response;
 }
